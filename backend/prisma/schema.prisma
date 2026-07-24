@@ -25,7 +25,7 @@ model User {
 model SmsCode {
   id        Int       @id @default(autoincrement())
   userId    Int
-  code      String
+  codeHash  String
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())

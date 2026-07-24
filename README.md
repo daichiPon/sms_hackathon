@@ -47,7 +47,7 @@ Backend API:
 ## Test account
 - id: demo
 - password: password
-- sms code: 1234
+- sms code: SMS で送信されるランダムな6桁
 
 ## Format
 commit 前に

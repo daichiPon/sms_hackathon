@@ -5,7 +5,7 @@ import LoginSuccess from './success';
 import { ApiError, networkError, toApiError } from './apiError';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL ?? 'http://localhost:3001';
-const SMS_CODE_LENGTH = 4;
+const SMS_CODE_LENGTH = 6;
 
 type Step = 'login' | 'verify' | 'success';
 

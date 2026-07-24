@@ -33,6 +33,16 @@ services:
       PORT: "3001"
       FRONTEND_ORIGIN: http://localhost:3000
       DATABASE_URL: file:/data/dev.db
+<<<<<<< HEAD
+      OTP_HMAC_SECRET: ${OTP_HMAC_SECRET:-development-only-change-me}
+      SMS_API_BASE_URL: ${SMS_API_BASE_URL:-https://example.com}
+      SMS_API_TOKEN: ${SMS_API_TOKEN:-replace_me}
+      SMS_USER_REFERENCE: ${SMS_USER_REFERENCE:-teamip3-demo}
+      DEMO_USER_ID: ${DEMO_USER_ID:-demo}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-password}
+      DEMO_PHONE_NUMBER: ${DEMO_PHONE_NUMBER:-09001111101}
+=======
+>>>>>>> main
     ports:
       - "3001:3001"
     volumes:
