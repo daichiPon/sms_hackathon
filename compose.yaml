@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: ./sms_hackathon
+      context: ./frontend
       target: development
     command: npm start
     environment:
@@ -12,7 +12,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./sms_hackathon:/app
+      - ./frontend:/app
       - node_modules:/app/node_modules
     depends_on:
       postgres:
