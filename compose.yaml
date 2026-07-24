@@ -1,0 +1,69 @@
+services:
+  app:
+    build:
+      context: ./frontend
+      target: development
+    command: npm start
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      DATABASE_URL: postgresql://app:app@postgres:5432/sms_hackathon
+      REDIS_URL: redis://redis:6379
+      WDS_SOCKET_PORT: "0"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    init: true
+    stdin_open: true
+    tty: true
+
+  postgres:
+    image: docker.io/library/postgres:17-alpine
+    environment:
+      POSTGRES_DB: sms_hackathon
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d sms_hackathon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: docker.io/library/redis:8-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: docker.io/library/adminer:5
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  node_modules:
+  postgres_data:
+  redis_data:
+
