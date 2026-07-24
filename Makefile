@@ -1,6 +1,6 @@
 COMPOSE := docker compose
 
-.PHONY: up down logs status
+.PHONY: up down logs status build clean
 
 up:
 	$(COMPOSE) up --build -d
@@ -13,3 +13,9 @@ logs:
 
 status:
 	$(COMPOSE) ps
+
+build:
+	$(COMPOSE) build
+
+clean:
+	$(COMPOSE) down --volumes --remove-orphans
