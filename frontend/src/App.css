@@ -1,0 +1,25 @@
+.auth-form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.auth-form input {
+  font-size: 16px;
+  padding: 8px;
+  width: 240px;
+}
+
+.auth-form button {
+  cursor: pointer;
+  margin-top: 8px;
+  padding: 8px 20px;
+}
+
+.auth-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

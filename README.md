@@ -8,18 +8,35 @@ npm --version
 
 ## Set up
 
-### location
+### Frontend location
 ```
-sms_hackathon/
+frontend/
 ```
 
 ```bash
 git pull
+cd frontend
 npm ci
 cp .env.example .env
-npm run dev
+npm start
 ```
 package-lock.jsonがない場合は、最初の一度だけnpm installを実行
+
+### Backend location
+```
+backend/
+```
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run start:dev
+```
+
+Backend API:
+- POST /auth/login
+- POST /auth/verify-sms
 
 ## Branch rules
 - mainブランチにダイレクトにPushしない
