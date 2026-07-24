@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { randomInt } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { SmsService } from '../sms/sms.service';
 import { LoginDto } from './dto/login.dto';
@@ -101,8 +102,8 @@ export class AuthService {
     };
   }
 
-  private generateSmsCode() {
-    return this.config.get<string>('DEMO_SMS_CODE') ?? '1234';
+  private generateSmsCode(): string {
+    return randomInt(0, 1_000_000).toString().padStart(6, '0');
   }
 
   private async findOrCreateDemoUser() {

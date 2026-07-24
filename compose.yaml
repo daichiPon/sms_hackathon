@@ -37,7 +37,6 @@ services:
       DEMO_USER_ID: ${DEMO_USER_ID:-demo}
       DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-password}
       DEMO_PHONE_NUMBER: ${DEMO_PHONE_NUMBER:-09001111101}
-      DEMO_SMS_CODE: ${DEMO_SMS_CODE:-1234}
     ports:
       - "3001:3001"
     volumes:

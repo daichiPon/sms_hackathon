@@ -5,6 +5,6 @@ export class VerifySmsDto {
   id!: string;
 
   @IsString()
-  @Matches(/^\d{4,6}$/)
+  @Matches(/^\d{6}$/)
   code!: string;
 }

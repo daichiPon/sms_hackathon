@@ -54,7 +54,7 @@ function useCountdown(expiresAt?: string): number | null {
 
 export default function VerifyCode({
   destination,
-  length = 4,
+  length = 6,
   onVerify,
   onResend,
   onBack,
