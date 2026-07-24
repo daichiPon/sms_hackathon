@@ -31,6 +31,8 @@ backend/
 cd backend
 npm install
 cp .env.example .env
+npm run db:migrate
+npm run db:generate
 npm run start:dev
 ```
 

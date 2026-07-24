@@ -1,1 +1,10 @@
 .env
+/generated/prisma
+dev.db
+dev.db-journal
+node_modules/
+dist/
+.agents/
+.claude/
+.windsurf/
+skills-lock.json

@@ -1,38 +1,50 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../prisma/prisma.service';
 import { SmsService } from '../sms/sms.service';
 import { LoginDto } from './dto/login.dto';
 import { VerifySmsDto } from './dto/verify-sms.dto';
 
-type SmsCodeRecord = {
-  code: string;
-  expiresAt: Date;
-  usedAt?: Date;
-};
-
 @Injectable()
 export class AuthService {
-  private readonly smsCodes = new Map<string, SmsCodeRecord>();
-
   constructor(
     private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
     private readonly smsService: SmsService,
   ) {}
 
   async login(loginDto: LoginDto) {
-    const user = this.getDemoUser();
+    const user = await this.findOrCreateDemoUser();
 
-    if (loginDto.id !== user.id || loginDto.password !== user.password) {
+    if (loginDto.id !== user.loginId || loginDto.password !== user.passwordHash) {
       throw new UnauthorizedException('Invalid id or password');
     }
 
     const code = this.generateSmsCode();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-    this.smsCodes.set(user.id, { code, expiresAt });
 
-    await this.smsService.sendSms({
+    await this.prisma.smsCode.create({
+      data: {
+        userId: user.id,
+        code,
+        expiresAt,
+      },
+    });
+
+    const smsResult = await this.smsService.sendSms({
       to: user.phoneNumber,
       text: `ワンタイムパスワードは ${code} です。`,
+    });
+
+    await this.prisma.smsLog.create({
+      data: {
+        userId: user.id,
+        phoneNumber: user.phoneNumber,
+        status: smsResult.status,
+        errorCode: smsResult.errorCode,
+        message: smsResult.message,
+        userReference: smsResult.userReference,
+      },
     });
 
     return {
@@ -41,10 +53,28 @@ export class AuthService {
     };
   }
 
-  verifySms(verifySmsDto: VerifySmsDto) {
-    const record = this.smsCodes.get(verifySmsDto.id);
+  async verifySms(verifySmsDto: VerifySmsDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        loginId: verifySmsDto.id,
+      },
+    });
 
-    if (!record || record.usedAt) {
+    if (!user) {
+      throw new BadRequestException('SMS code not found');
+    }
+
+    const record = await this.prisma.smsCode.findFirst({
+      where: {
+        userId: user.id,
+        usedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (!record) {
       throw new BadRequestException('SMS code not found');
     }
 
@@ -56,11 +86,18 @@ export class AuthService {
       throw new UnauthorizedException('Invalid SMS code');
     }
 
-    record.usedAt = new Date();
+    await this.prisma.smsCode.update({
+      where: {
+        id: record.id,
+      },
+      data: {
+        usedAt: new Date(),
+      },
+    });
 
     return {
       message: 'Login verified',
-      userId: verifySmsDto.id,
+      userId: user.loginId,
     };
   }
 
@@ -68,11 +105,24 @@ export class AuthService {
     return this.config.get<string>('DEMO_SMS_CODE') ?? '1234';
   }
 
-  private getDemoUser() {
-    return {
-      id: this.config.get<string>('DEMO_USER_ID') ?? 'demo',
-      password: this.config.get<string>('DEMO_USER_PASSWORD') ?? 'password',
-      phoneNumber: this.config.get<string>('DEMO_PHONE_NUMBER') ?? '09001111101',
-    };
+  private async findOrCreateDemoUser() {
+    const loginId = this.config.get<string>('DEMO_USER_ID') ?? 'demo';
+    const password = this.config.get<string>('DEMO_USER_PASSWORD') ?? 'password';
+    const phoneNumber = this.config.get<string>('DEMO_PHONE_NUMBER') ?? '09001111101';
+
+    return this.prisma.user.upsert({
+      where: {
+        loginId,
+      },
+      update: {
+        passwordHash: password,
+        phoneNumber,
+      },
+      create: {
+        loginId,
+        passwordHash: password,
+        phoneNumber,
+      },
+    });
   }
 }
