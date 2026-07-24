@@ -14,13 +14,22 @@ function App() {
   
 
   return (
-    <div className="app">
-      <div className="input-card">
-        <label className="input-label" htmlFor="text-input">
+    <div
+      className="app"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <label className="input-label" htmlFor="id-input">
           ID
         </label>
         <input
-          id="text-input"
+          id="id-input"
           className="text-input"
           type="text"
           value={id}
@@ -29,14 +38,14 @@ function App() {
         />
       </div>
 
-      <div className="input-card">
-        <label className="input-label" htmlFor="text-input">
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <label className="input-label" htmlFor="pw-input">
           PW
         </label>
         <input
-          id="text-input"
+          id="pw-input"
           className="text-input"
-          type="text"
+          type="password"
           value={pw}
           onChange={handleChange_pw}
           placeholder="ここに入力"
