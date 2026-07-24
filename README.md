@@ -10,11 +10,12 @@ npm --version
 
 ### Frontend location
 ```
-sms_hackathon/
+frontend/
 ```
 
 ```bash
 git pull
+cd frontend
 npm ci
 cp .env.example .env
 npm start
@@ -27,6 +28,7 @@ backend/
 ```
 
 ```bash
+cd backend
 npm install
 cp .env.example .env
 npm run start:dev
