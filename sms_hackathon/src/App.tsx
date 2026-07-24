@@ -2,56 +2,63 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [id, set_id] = useState('');
-  const [pw, set_pw] = useState('');
+  const [form, setForm] = useState({ id: '', pw: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleChange_id = (e: React.ChangeEvent<HTMLInputElement>) => {
-    set_id(e.target.value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
-    const handleChange_pw = (e: React.ChangeEvent<HTMLInputElement>) => {
-    set_pw(e.target.value);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',  // Cookieでセッション受け取る場合
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        throw new Error('IDまたはパスワードが違います');
+      }
+
+      const data = await res.json();
+      console.log(data);
+      setForm(prev => ({ ...prev, pw: '' }));
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '通信エラー');
+    } finally {
+      setLoading(false);
+    }
   };
-  
 
   return (
-    <div
-      className="app"
-      style={{
+    <form
+    onSubmit={handleSubmit}
+    style={{
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
       }}
-    >
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
-        <label className="input-label" htmlFor="id-input">
-          ID
-        </label>
-        <input
-          id="id-input"
-          className="text-input"
-          type="text"
-          value={id}
-          onChange={handleChange_id}
-          placeholder="ここに入力"
-        />
-      </div>
+      >
+      <input name="id" value={form.id} onChange={handleChange} />
+      <input name="pw" type="password" value={form.pw} onChange={handleChange} />
 
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
-        <label className="input-label" htmlFor="pw-input">
-          PW
-        </label>
-        <input
-          id="pw-input"
-          className="text-input"
-          type="password"
-          value={pw}
-          onChange={handleChange_pw}
-          placeholder="ここに入力"
-        />
-      </div>
-    </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      <button style={{marginTop:20}} type="submit" disabled={loading}>
+        {loading ? '送信中...' : 'ログイン'}
+      </button>
+    </form>
   );
 }
 
