@@ -1,69 +1,52 @@
 services:
-  app:
+  frontend:
     build:
       context: ./frontend
       target: development
     command: npm start
     environment:
       CHOKIDAR_USEPOLLING: "true"
-      DATABASE_URL: postgresql://app:app@postgres:5432/sms_hackathon
-      REDIS_URL: redis://redis:6379
+      REACT_APP_API_BASE_URL: http://localhost:3001
       WDS_SOCKET_PORT: "0"
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-      - node_modules:/app/node_modules
+      - frontend_node_modules:/app/node_modules
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - backend
     init: true
     stdin_open: true
     tty: true
 
-  postgres:
-    image: docker.io/library/postgres:17-alpine
+  backend:
+    build:
+      context: ./backend
+      target: development
+    command:
+      - sh
+      - -c
+      - npm run db:generate && npx prisma migrate deploy && npm run start:dev
     environment:
-      POSTGRES_DB: sms_hackathon
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
+      PORT: "3001"
+      FRONTEND_ORIGIN: http://localhost:3000
+      DATABASE_URL: file:/data/dev.db
+      SMS_API_BASE_URL: ${SMS_API_BASE_URL:-https://example.com}
+      SMS_API_TOKEN: ${SMS_API_TOKEN:-replace_me}
+      SMS_USER_REFERENCE: ${SMS_USER_REFERENCE:-teamip3-demo}
+      DEMO_USER_ID: ${DEMO_USER_ID:-demo}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-password}
+      DEMO_PHONE_NUMBER: ${DEMO_PHONE_NUMBER:-09001111101}
+      DEMO_SMS_CODE: ${DEMO_SMS_CODE:-1234}
     ports:
-      - "5432:5432"
+      - "3001:3001"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d sms_hackathon"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  redis:
-    image: docker.io/library/redis:8-alpine
-    command: redis-server --appendonly yes
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  adminer:
-    image: docker.io/library/adminer:5
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+      - backend_database:/data
+    init: true
 
 volumes:
-  node_modules:
-  postgres_data:
-  redis_data:
-
+  frontend_node_modules:
+  backend_node_modules:
+  backend_database:

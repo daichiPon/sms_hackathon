@@ -1,6 +1,6 @@
 COMPOSE := docker compose
 
-.PHONY: up down logs status build clean
+.PHONY: up down logs ps build clean
 
 up:
 	$(COMPOSE) up --build -d
@@ -9,9 +9,9 @@ down:
 	$(COMPOSE) down
 
 logs:
-	$(COMPOSE) logs -f app
+	$(COMPOSE) logs -f frontend backend
 
-status:
+ps:
 	$(COMPOSE) ps
 
 build:
