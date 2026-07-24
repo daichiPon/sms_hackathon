@@ -27,10 +27,13 @@ services:
       - sh
       - -c
       - npm run db:generate && npx prisma migrate deploy && npm run start:dev
+    env_file:
+      - ./backend/.env
     environment:
       PORT: "3001"
       FRONTEND_ORIGIN: http://localhost:3000
       DATABASE_URL: file:/data/dev.db
+<<<<<<< HEAD
       OTP_HMAC_SECRET: ${OTP_HMAC_SECRET:-development-only-change-me}
       SMS_API_BASE_URL: ${SMS_API_BASE_URL:-https://example.com}
       SMS_API_TOKEN: ${SMS_API_TOKEN:-replace_me}
@@ -38,6 +41,8 @@ services:
       DEMO_USER_ID: ${DEMO_USER_ID:-demo}
       DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-password}
       DEMO_PHONE_NUMBER: ${DEMO_PHONE_NUMBER:-09001111101}
+=======
+>>>>>>> main
     ports:
       - "3001:3001"
     volumes:
