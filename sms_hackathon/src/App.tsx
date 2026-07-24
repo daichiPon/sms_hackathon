@@ -20,7 +20,7 @@ function App() {
       const res = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',  // Cookieでセッション受け取る場合
+        credentials: 'include',
         body: JSON.stringify(form),
       });
 
