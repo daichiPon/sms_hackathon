@@ -46,3 +46,45 @@ npm install <package-name>
 ```
 npm install --save-dev <package-name>
 ```
+
+## Docker で開発する
+
+Docker Compose を使うと、フロントエンド、PostgreSQL、Redis、Adminer をまとめて起動できます。
+
+```bash
+docker compose up --build
+```
+
+起動後:
+
+- アプリ: http://localhost:3000
+- Adminer: http://localhost:8080
+- PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
+
+Adminer の接続情報:
+
+- データベース種類: PostgreSQL
+- サーバー: `postgres`
+- ユーザー名: `app`
+- パスワード: `app`
+- データベース: `sms_hackathon`
+
+終了:
+
+```bash
+docker compose down
+```
+
+データベースと Redis の永続データも削除して初期化する場合:
+
+```bash
+docker compose down --volumes
+```
+
+依存パッケージを追加した後は、アプリ用イメージと `node_modules` ボリュームを更新します。
+
+```bash
+docker compose build app
+docker compose run --rm app npm ci
+```
