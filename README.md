@@ -31,8 +31,8 @@ backend/
 cd backend
 npm install
 cp .env.example .env
-npx prisma migrate dev
-npx prisma generate
+npm run db:migrate
+npm run db:generate
 npm run start:dev
 ```
 
