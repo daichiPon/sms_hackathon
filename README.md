@@ -24,7 +24,6 @@ package-lock.jsonがない場合は、最初の一度だけnpm installを実行
 ## Branch rules
 - mainブランチにダイレクトにPushしない
 - feature/... brを作る
-- develop br にpushする
 
 ## Test account
 - id: demo
