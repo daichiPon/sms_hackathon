@@ -31,6 +31,7 @@ services:
       PORT: "3001"
       FRONTEND_ORIGIN: http://localhost:3000
       DATABASE_URL: file:/data/dev.db
+      OTP_HMAC_SECRET: ${OTP_HMAC_SECRET:-development-only-change-me}
       SMS_API_BASE_URL: ${SMS_API_BASE_URL:-https://example.com}
       SMS_API_TOKEN: ${SMS_API_TOKEN:-replace_me}
       SMS_USER_REFERENCE: ${SMS_USER_REFERENCE:-teamip3-demo}

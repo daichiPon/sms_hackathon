@@ -1,9 +1,9 @@
-# DBでOTPを確認する方法
+# DBでOTPの発行状態を確認する方法
 
-このプロジェクトの開発環境では、OTPはSQLiteの`SmsCode`テーブルに保存されます。
+OTPの平文はDBへ保存されません。HMAC-SHA-256値はSQLiteの`SmsCode`テーブルに保存されます。
 以下の手順は開発・デバッグ用途に限定してください。
 
-## Docker環境で最新のOTPを確認する
+## Docker環境で最新のOTP発行状態を確認する
 
 プロジェクトのルートディレクトリで、次のコマンドを実行します。
 
@@ -15,7 +15,7 @@ const Database = require(
 const db = new Database('/data/dev.db', { readonly: true });
 const result = db.prepare(\`
   SELECT
-    s.code,
+    s.codeHash,
     s.expiresAt,
     s.usedAt,
     s.createdAt,
@@ -34,7 +34,7 @@ console.log(result ?? 'OTPはまだ発行されていません');
 
 ```text
 {
-  code: '044777',
+  codeHash: '<64-character hex digest>',
   expiresAt: '2026-07-24T08:47:10.482+00:00',
   usedAt: null,
   createdAt: '2026-07-24T08:42:10.485+00:00',
@@ -45,7 +45,7 @@ console.log(result ?? 'OTPはまだ発行されていません');
 
 各項目の意味:
 
-- `code`: 入力する6桁のOTP。先頭の`0`も含めます。
+- `codeHash`: OTPのHMAC-SHA-256値です。元の6桁OTPへ復元はできません。
 - `expiresAt`: OTPの有効期限です。DBではUTCで表示されます。
 - `usedAt`: `null`なら未使用、日時が入っていれば使用済みです。
 - `createdAt`: OTPを発行した日時です。
@@ -64,7 +64,7 @@ const Database = require(
 const db = new Database('/data/dev.db', { readonly: true });
 const result = db.prepare(\`
   SELECT
-    s.code,
+    s.codeHash,
     s.expiresAt,
     u.loginId,
     u.phoneNumber
@@ -86,7 +86,7 @@ console.log(result ?? '有効なOTPはありません');
 
 ```sql
 SELECT
-  s.code,
+  s.codeHash,
   s.expiresAt,
   s.usedAt,
   s.createdAt,
@@ -104,6 +104,6 @@ Docker Compose環境のDBファイルはコンテナ内の`/data/dev.db`です�
 
 - OTPを確認するのは開発環境だけにしてください。
 - OTPをチャット、Issue、画面キャプチャ、ログへ残さないでください。
-- 本番環境ではDBへOTPを平文保存せず、HMACまたはハッシュを保存してください。
+- `OTP_HMAC_SECRET`は十分に長いランダム値を設定し、DBとは別に管理してください。
 - 確認コマンドでは、誤更新を防ぐためDBを読み取り専用で開いています。
 - OTPは発行から5分で期限切れになり、認証成功後は再利用できません。
